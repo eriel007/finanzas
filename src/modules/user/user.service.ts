@@ -1,5 +1,5 @@
 import { userRepository } from "./user.repository";
-import type { CreateAccountInput,UpdateAccountInput } from "./user.types";
+import type { CreateUserInput, UpdateUserInput } from "./user.types";
 
 export const userService = {
   getUsers : async()=>{
@@ -17,15 +17,16 @@ export const userService = {
   },
 
   //--- create a new user---
-  createUser : async(data:CreateAccountInput)=>{
+  createUser : async(data:CreateUserInput)=>{
     const existingUser = await userRepository.findByEmail(data.email);
     if(existingUser) throw new Error("Email already in use");
     return userRepository.create(data);
   },
 
   // --- update ---
-  updateUser : async(id:string, data:UpdateAccountInput)=>{
-    await userRepository.findById(id);
+  updateUser : async(id:string, data:UpdateUserInput)=>{
+    const existing = await userRepository.findById(id);
+    if (!existing) throw new Error("User not found");
     
     if (data.email){
       const existingUser = await userRepository.findByEmail(data.email);
